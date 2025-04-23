@@ -452,7 +452,7 @@ class MixedBrineCalculator:
         
         # Thermal expansion coefficient needs to be POSITIVE
         # Water density DECREASES with temperature, so α should be positive
-        alpha = 0.0002  # Thermal expansion coefficient (1/K)
+        alpha = 0.000214  # Thermal expansion coefficient (1/K)
         dT = temperature - T0
         
         # Compressibility - water density INCREASES with pressure

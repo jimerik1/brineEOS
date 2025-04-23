@@ -283,7 +283,7 @@ class SingleBrineCalculator:
         rho0 = 999.975  # kg/m³
         
         # Temperature effect (simplified)
-        alpha = -0.0002  # Thermal expansion coefficient (1/K)
+        alpha = -0.000214  # Thermal expansion coefficient (1/K)
         dT = temperature - T0
         
         # Pressure effect (simplified)
