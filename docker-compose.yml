@@ -1,0 +1,14 @@
+# docker-compose.yml
+version: '3'
+
+services:
+  brine-density-api:
+    build: .
+    ports:
+      - "5099:5000"
+    volumes:
+      - ./logs:/app/logs
+    restart: always
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
