@@ -78,6 +78,9 @@ class MixedBrineCalculator:
         Returns:
             float: Density in kg/m³
         """
+        print("DEBUG: Starting calculation for mixed brine with composition:", salt_composition)
+        print(f"DEBUG: Temperature = {temperature}K, Pressure = {pressure}MPa")
+        
         if not salt_composition:
             raise ValueError("Salt composition is required for mixed brine calculations")
         
@@ -86,6 +89,8 @@ class MixedBrineCalculator:
         for salt, pct in salt_composition.items():
             if salt in self.salt_configs and pct > 0:
                 water_wt_pct -= pct
+        
+        print(f"DEBUG: Water weight percentage = {water_wt_pct}%")  # Should be 50.7% for the example
         
         if water_wt_pct <= 0:
             raise ValueError("Invalid salt composition: total exceeds 100%")
@@ -99,6 +104,7 @@ class MixedBrineCalculator:
                     self.salt_configs[salt]['molecular_weight'], 
                     water_wt_pct
                 )
+                print(f"DEBUG: Molality of {salt} = {molalities[salt]} mol/kg")
         
         # Calculate ion molalities and charges
         ion_molalities = {}
@@ -123,40 +129,67 @@ class MixedBrineCalculator:
                 ion_charges[anion] = config['ions']['anion']['charge']
             ion_molalities[anion] += molality * anion_stoich
         
+        print("DEBUG: Ion molalities:", ion_molalities)
+        print("DEBUG: Ion charges:", ion_charges)
+        
         # Calculate ionic strength (Equation 3)
         ionic_strength = 0.5 * sum(ion_molalities[ion] * ion_charges[ion]**2 
                                 for ion in ion_molalities)
         
-        # Calculate water density
+        print(f"DEBUG: Ionic strength = {ionic_strength}")  # Should be 20.3 for the example
+        
+        # Calculate water density at given conditions
         water_density = self._calculate_water_density(temperature, pressure)
+        print(f"DEBUG: Water density = {water_density} kg/m³")
+        
+        # Calculate Debye-Hückel limiting law slope
+        A_v = self._calculate_debye_huckel_slope(temperature, pressure)
+        print(f"DEBUG: Debye-Hückel slope (A_v) = {A_v}")
         
         # For each salt, calculate apparent molal volume
-        total_volume_contribution = 0.0
-        total_mass_contribution = 0.0
+        numerator = 1.0  # Represents (1 + Σ mᵢMᵢ) in Equation 1
+        denominator = 1.0 / water_density  # Represents (1/ρw + Σ mᵢφᵢ) in Equation 1
+        
+        print("DEBUG: Calculating apparent molal volumes...")
+        
+        # Calculate normalization factors
+        N_factors = self._calculate_normalization_factors(
+            ion_molalities, ion_charges
+        )
+        print("DEBUG: Normalization factors:", N_factors)
         
         for salt, molality in molalities.items():
             if molality > 0:
                 config = self.salt_configs[salt]
+                M_salt = config['molecular_weight']
                 
-                # Calculate normalization factors for mixed salt interactions
-                N_factors = self._calculate_normalization_factors(
-                    salt, ion_molalities, ion_charges
-                )
+                # Add mass contribution to numerator
+                mass_contrib = molality * M_salt
+                numerator += mass_contrib
+                print(f"DEBUG: Mass contribution of {salt} = {mass_contrib}")
                 
-                # Calculate apparent molal volume for this salt in the mixture
-                # Pass ion_molalities and ion_charges to the method
+                # Calculate infinite dilution molal volume
+                phi_v0 = self._calculate_phi_v0(salt, temperature, pressure)
+                print(f"DEBUG: Infinite dilution molal volume for {salt} (phi_v0) = {phi_v0}")
+                
+                # Calculate apparent molal volume
                 phi_v = self._calculate_apparent_molal_volume(
                     salt, molality, temperature, pressure, ionic_strength, N_factors,
                     ion_molalities=ion_molalities, ion_charges=ion_charges
                 )
+                print(f"DEBUG: Apparent molal volume for {salt} (phi_v) = {phi_v}")
                 
-                # Add contribution to total volume and mass
-                M_salt = config['molecular_weight']
-                total_volume_contribution += molality * phi_v
-                total_mass_contribution += molality * M_salt
+                # Add volume contribution to denominator
+                vol_contrib = molality * phi_v
+                denominator += vol_contrib
+                print(f"DEBUG: Volume contribution of {salt} = {vol_contrib}")
+        
+        print(f"DEBUG: Final numerator = {numerator}")
+        print(f"DEBUG: Final denominator = {denominator}")
         
         # Calculate density using Equation 1
-        density = (1.0 + total_mass_contribution) / ((1.0 / water_density) + total_volume_contribution)
+        density = numerator / denominator
+        print(f"DEBUG: Calculated density = {density} kg/m³")
         
         return density
     
@@ -172,15 +205,16 @@ class MixedBrineCalculator:
         Returns:
             float: Molality in mol/kg
         """
-        return (weight_percent * 10.0) / (molecular_weight * water_wt_pct)
+        # The key calculation from Equation A-3 in the paper:
+        # Molality = (weight percentage of salt) / (molecular weight * weight percentage of water / 100)
+        return (weight_percent) / (molecular_weight * water_wt_pct )
     
-    def _calculate_normalization_factors(self, salt, ion_molalities, ion_charges):
+    def _calculate_normalization_factors(self, ion_molalities, ion_charges):
         """
         Calculate normalization factors for ion interactions in mixed salt solutions.
         Uses Equation 11 from the paper.
         
         Args:
-            salt (str): Salt identifier
             ion_molalities (dict): Molalities of all ions
             ion_charges (dict): Charges of all ions
             
@@ -189,32 +223,33 @@ class MixedBrineCalculator:
         """
         N_factors = {}
         
-        config = self.salt_configs[salt]
-        cation = config['ions']['cation']['symbol']
-        anion = config['ions']['anion']['symbol']
+        # Calculate separate sums for cations and anions
+        pos_charge_sum = 0.0
+        neg_charge_sum = 0.0
         
-        # Calculate normalization factors using Equation 11
-        # For cations
-        total_positive_charge = sum(
-            ion_molalities[ion] * ion_charges[ion]**2 
-            for ion in ion_molalities if ion_charges[ion] > 0
-        )
+        for ion, molality in ion_molalities.items():
+            charge = ion_charges[ion]
+            if charge > 0:  # Cation
+                pos_charge_sum += molality * charge**2
+            else:  # Anion
+                neg_charge_sum += molality * charge**2
         
-        if total_positive_charge > 0:
-            N_factors[cation] = (ion_molalities[cation] * ion_charges[cation]**2) / total_positive_charge
-        else:
-            N_factors[cation] = 0.0
+        print(f"DEBUG: Sum of Z²*m for positive ions = {pos_charge_sum}")
+        print(f"DEBUG: Sum of Z²*m for negative ions = {neg_charge_sum}")
         
-        # For anions
-        total_negative_charge = sum(
-            ion_molalities[ion] * ion_charges[ion]**2 
-            for ion in ion_molalities if ion_charges[ion] < 0
-        )
-        
-        if total_negative_charge > 0:
-            N_factors[anion] = (ion_molalities[anion] * ion_charges[anion]**2) / total_negative_charge
-        else:
-            N_factors[anion] = 0.0
+        # Calculate normalization factor for each ion
+        for ion, molality in ion_molalities.items():
+            charge = ion_charges[ion]
+            if charge > 0:  # Cation
+                if pos_charge_sum > 0:
+                    N_factors[ion] = (molality * charge**2) / pos_charge_sum
+                else:
+                    N_factors[ion] = 0.0
+            else:  # Anion
+                if neg_charge_sum > 0:
+                    N_factors[ion] = (molality * charge**2) / neg_charge_sum
+                else:
+                    N_factors[ion] = 0.0
         
         return N_factors
     
@@ -222,7 +257,6 @@ class MixedBrineCalculator:
                                     ionic_strength, N_factors, ion_molalities=None, ion_charges=None):
         """
         Calculate apparent molal volume for a salt in a mixture.
-        Uses the same approach as for single salt but with normalization factors.
         
         Args:
             salt (str): Salt identifier
@@ -250,42 +284,51 @@ class MixedBrineCalculator:
         z_cation = config['ions']['cation']['charge']
         z_anion = config['ions']['anion']['charge']
         
-        numerator = (v_cation * z_cation**2 + v_anion * z_anion**2) * A_v * ionic_strength**0.5
-        denominator = 2 * (1 + ionic_strength**0.5)
-        DH_term = numerator / denominator
+        # Implement Debye-Hückel term from Equation 2
+        dh_numerator = (v_cation * z_cation**2 + v_anion * z_anion**2) * A_v * ionic_strength**0.5
+        dh_denominator = 2 * (1 + ionic_strength**0.5)
+        DH_term = dh_numerator / dh_denominator
+        
+        print(f"DEBUG: Debye-Hückel term for {salt} = {DH_term}")
         
         # If ion molalities aren't provided, we skip the interaction terms
         if ion_molalities is None or ion_charges is None:
             return phi_v0 + DH_term
         
-        # Calculate interaction terms for mixed salts (Equation 10)
+        # Get cation and anion symbols for this salt
         cation = config['ions']['cation']['symbol']
         anion = config['ions']['anion']['symbol']
         
-        # Interaction with all anions
-        cation_interaction = 0
-        for ion, m_ion in ion_molalities.items():
-            if ion_charges.get(ion, 0) < 0:  # Only consider anions
+        # Calculate interaction term using Equation 10
+        cation_interaction = 0.0
+        for ion, molality_ion in ion_molalities.items():
+            if ion_charges.get(ion, 0) < 0:  # Anions
+                # Get the appropriate BMX term for this salt
                 B_MX = self._calculate_interaction_parameter(
                     salt, temperature, pressure, ionic_strength
                 )
                 N_ion = N_factors.get(ion, 0)
-                cation_interaction += v_cation * N_ion * B_MX * m_ion
+                term = v_cation * N_ion * B_MX * molality_ion
+                cation_interaction += term
+                print(f"DEBUG: {cation}-{ion} interaction term = {term}")
         
-        # Interaction with all cations
-        anion_interaction = 0
-        for ion, m_ion in ion_molalities.items():
-            if ion_charges.get(ion, 0) > 0:  # Only consider cations
+        anion_interaction = 0.0
+        for ion, molality_ion in ion_molalities.items():
+            if ion_charges.get(ion, 0) > 0:  # Cations
+                # Get the appropriate BMX term for this salt
                 B_MX = self._calculate_interaction_parameter(
                     salt, temperature, pressure, ionic_strength
                 )
                 N_ion = N_factors.get(ion, 0)
-                anion_interaction += v_anion * N_ion * B_MX * m_ion
+                term = v_anion * N_ion * B_MX * molality_ion
+                anion_interaction += term
+                print(f"DEBUG: {anion}-{ion} interaction term = {term}")
         
-        # Total interaction term
+        # Total interaction term (divide by 2 per Equation 10)
         interaction_term = (cation_interaction + anion_interaction) / 2
+        print(f"DEBUG: Total interaction term for {salt} = {interaction_term}")
         
-        # Combine terms
+        # Combine all terms (Equation 2)
         phi_v = phi_v0 + DH_term + interaction_term
         
         return phi_v
@@ -368,7 +411,7 @@ class MixedBrineCalculator:
         config = self.salt_configs[salt]
         coeffs = config['interaction_coeffs']
         
-        # Calculate B0 (temperature and pressure dependent)
+        # Calculate B0 (temperature and pressure dependent) - Equation 5
         B0 = (coeffs.get('B00', 0) + 
              coeffs.get('B10', 0) * temperature + 
              coeffs.get('B20', 0) * temperature**2)
@@ -386,7 +429,7 @@ class MixedBrineCalculator:
         # Calculate B1 (concentration dependent term)
         B1 = coeffs.get('B1', 0)
         
-        # Calculate BMX (Equation 5-6 from paper)
+        # Calculate BMX (Equation 6 from paper)
         B_MX = B0 + B1 * ionic_strength
         
         return B_MX
@@ -402,17 +445,22 @@ class MixedBrineCalculator:
         Returns:
             float: Water density in kg/m³
         """
-        # Same implementation as in SingleBrineCalculator
+        # Reference conditions
         T0 = 273.15  # K
         P0 = 0.1     # MPa
         rho0 = 999.975  # kg/m³
         
-        alpha = -0.0002  # Thermal expansion coefficient (1/K)
+        # Thermal expansion coefficient needs to be POSITIVE
+        # Water density DECREASES with temperature, so α should be positive
+        alpha = 0.0002  # Thermal expansion coefficient (1/K)
         dT = temperature - T0
         
+        # Compressibility - water density INCREASES with pressure
         beta = 0.46e-9  # Compressibility (1/Pa)
         dP = (pressure - P0) * 1e6  # Convert MPa to Pa
         
+        # Calculate density - make sure formula is correct!
+        # ρ = ρ₀ × (1 + β×dP) / (1 + α×dT)
         rho = rho0 * (1 + beta * dP) / (1 + alpha * dT)
         
         return rho
