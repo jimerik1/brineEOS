@@ -125,7 +125,7 @@ class MixedBrineCalculator:
         
         # Calculate ionic strength (Equation 3)
         ionic_strength = 0.5 * sum(ion_molalities[ion] * ion_charges[ion]**2 
-                                  for ion in ion_molalities)
+                                for ion in ion_molalities)
         
         # Calculate water density
         water_density = self._calculate_water_density(temperature, pressure)
@@ -144,8 +144,10 @@ class MixedBrineCalculator:
                 )
                 
                 # Calculate apparent molal volume for this salt in the mixture
+                # Pass ion_molalities and ion_charges to the method
                 phi_v = self._calculate_apparent_molal_volume(
-                    salt, molality, temperature, pressure, ionic_strength, N_factors
+                    salt, molality, temperature, pressure, ionic_strength, N_factors,
+                    ion_molalities=ion_molalities, ion_charges=ion_charges
                 )
                 
                 # Add contribution to total volume and mass
@@ -217,7 +219,7 @@ class MixedBrineCalculator:
         return N_factors
     
     def _calculate_apparent_molal_volume(self, salt, molality, temperature, pressure, 
-                                        ionic_strength, N_factors):
+                                    ionic_strength, N_factors, ion_molalities=None, ion_charges=None):
         """
         Calculate apparent molal volume for a salt in a mixture.
         Uses the same approach as for single salt but with normalization factors.
@@ -229,6 +231,8 @@ class MixedBrineCalculator:
             pressure (float): Pressure in MPa
             ionic_strength (float): Total ionic strength of the solution
             N_factors (dict): Normalization factors for ions
+            ion_molalities (dict, optional): Molalities of all ions
+            ion_charges (dict, optional): Charges of all ions
             
         Returns:
             float: Apparent molal volume in m³/mol
@@ -249,6 +253,10 @@ class MixedBrineCalculator:
         numerator = (v_cation * z_cation**2 + v_anion * z_anion**2) * A_v * ionic_strength**0.5
         denominator = 2 * (1 + ionic_strength**0.5)
         DH_term = numerator / denominator
+        
+        # If ion molalities aren't provided, we skip the interaction terms
+        if ion_molalities is None or ion_charges is None:
+            return phi_v0 + DH_term
         
         # Calculate interaction terms for mixed salts (Equation 10)
         cation = config['ions']['cation']['symbol']
