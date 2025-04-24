@@ -1,4 +1,3 @@
-# config/nacl_config.py
 """
 Configuration for NaCl density calculations from Tables 2 and 3
 """
@@ -20,27 +19,26 @@ CONFIG = {
         }
     },
     'phi_v0_coeffs': {
-        'A00': -7.1828e-5,
-        'A10': 5.8004e-7,
-        'A20': -8.8181e-10,
-        'A01': 5.3789e-7,
-        'A11': -32.1810e-10,
-        'A21': 4.7183e-12,
-        'A02': 2.3388e-10,
-        'A12': -3.8432e-12,
-        'A22': 0.0
+        'A00': -7.1829e5,
+        'A10': 5.6004e7,
+        'A20': -8.6619e10,
+        'A01': 5.3789e7,
+        'A11': -32.1990e10,
+        'A21': 4.7893e12,
+        'A02': 0.0,  # No value in table
+        'A12': 2.3368e12,
+        'A22': -3.9432e15
     },
     'debye_huckel_coeffs': DEBYE_HUCKEL_COEFFS,
     'interaction_coeffs': {
-        'B00': 2.7167e-6,
-        'B10': 0.0,
-        'B20': 0.0,
-        'B01': 0.0,
-        'B11': 7.8163e-14,
-        'B21': 0.0,
-        'B02': 0.0,
-        'B12': 3.6462e-13,
-        'B22': 0.0,
-        'B1': -9.0242e-8
+        'B00': 0.0,  # No value in table
+        'B10': 2.7157e9,
+        'B20': 0.0,  # No value in table
+        'B01': 0.0,  # No value in table 
+        'B11': 0.0,  # No value in table
+        'B21': 7.6153e14,
+        'B02': 0.0,  # No value in table
+        'B12': 3.5482e13,
+        'B1': -9.0242e8
     }
 }

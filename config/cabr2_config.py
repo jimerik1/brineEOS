@@ -1,4 +1,3 @@
-# config/cabr2_config.py (continued)
 """
 Configuration for CaBr2 density calculations from Tables 2 and 3
 """
@@ -20,27 +19,26 @@ CONFIG = {
         }
     },
     'phi_v0_coeffs': {
-        'A00': -13.5882e-5,
-        'A10': 10.5681e-7,
-        'A20': -16.5140e-10,
-        'A01': 1.1752e-7,
-        'A11': 52.5124e-10,
-        'A21': -28.5896e-12,
-        'A02': 37.3889e-10,
-        'A12': 0.0,
-        'A22': 0.0
+        'A00': -13.6982e5,
+        'A10': 10.5661e7,
+        'A20': -16.5140e10,
+        'A01': 0.0,  # No value in table
+        'A11': 0.0,  # No value in table
+        'A21': 1.1752e12,
+        'A02': 52.5124e10,
+        'A12': -29.5866e12,
+        'A22': 37.3999e15,
     },
     'debye_huckel_coeffs': DEBYE_HUCKEL_COEFFS,
     'interaction_coeffs': {
-        'B00': 6.8218e-6,
-        'B10': -25.4804e-9,
-        'B20': 0.0,
-        'B01': -7.4830e-8,
-        'B11': 2.2943e-11,
-        'B21': 0.0,
-        'B02': 0.0,
-        'B12': -3.4634e-13,
-        'B22': 0.0,
-        'B1': 0.0
+        'B00': 5.8218e6,
+        'B10': -25.4804e9,
+        'B20': 3.6141e11,
+        'B01': -7.4830e9,
+        'B11': 0.0,  # No value in table
+        'B21': 0.0,  # No value in table
+        'B02': 2.2843e11,
+        'B12': 0.0,  # No value in table
+        'B1': -3.4634e8
     }
 }

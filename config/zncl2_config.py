@@ -1,4 +1,3 @@
-# config/znclc_config.py
 """
 Configuration for ZnCl2 density calculations from Tables 2 and 3
 """
@@ -20,21 +19,26 @@ CONFIG = {
         }
     },
     'phi_v0_coeffs': {
-        'A00': 1.1470e-5,  # Limited data available
-        'A10': 0.0,
-        'A20': 0.0,
-        'A01': 0.0,
-        'A11': 0.0,
-        'A21': 0.0
+        'A00': 1.6470e5,
+        'A10': 0.0,  # No value in table
+        'A20': 0.0,  # No value in table
+        'A01': 0.0,  # No value in table
+        'A11': 0.0,  # No value in table
+        'A21': 0.0,  # No value in table
+        'A02': 0.0,  # No value in table
+        'A12': 0.0,  # No value in table
+        'A22': 0.0   # No value in table
     },
     'debye_huckel_coeffs': DEBYE_HUCKEL_COEFFS,
     'interaction_coeffs': {
-        'B00': 1.8141e-6,
-        'B10': 0.0,
-        'B20': 0.0,
-        'B01': 0.0,
-        'B11': 0.0,
-        'B21': 0.0,
-        'B1': -1.7876e-8
+        'B00': 1.9141e6,
+        'B10': 0.0,  # No value in table
+        'B20': 0.0,  # No value in table
+        'B01': 0.0,  # No value in table
+        'B11': 0.0,  # No value in table
+        'B21': 0.0,  # No value in table
+        'B02': 0.0,  # No value in table
+        'B12': 0.0,  # No value in table
+        'B1': -1.7875e8
     }
 }

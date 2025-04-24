@@ -1,4 +1,3 @@
-# config/cacl2_config.py
 """
 Configuration for CaCl2 density calculations from Tables 2 and 3
 """
@@ -20,27 +19,27 @@ CONFIG = {
         }
     },
     'phi_v0_coeffs': {
-        'A00': -13.4695e-5,
-        'A10': 9.824e-7,
-        'A20': -15.783e-10,
-        'A01': 1.348e-7,
-        'A11': 48.2362e-10,
-        'A21': -27.4851e-12,
-        'A02': 34.3983e-10,
-        'A12': 0.0,
-        'A22': 0.0
+        'A00': -13.4695e5,
+        'A10': 9.8240e7,
+        'A20': -15.7830e10,
+        'A01': 0.0, # No value in table
+        'A11': 0.0, # No value in table
+        'A21': 1.2489e12,
+        'A02': 48.2352e10,
+        'A12': -27.4851e12,
+        'A22': 34.3693e15,
+
     },
     'debye_huckel_coeffs': DEBYE_HUCKEL_COEFFS,
     'interaction_coeffs': {
-        'B00': 4.9949e-6,
-        'B10': -22.6474e-9,
-        'B20': 3.3664e-11,
-        'B01': -7.1662e-8,
-        'B11': 2.8029e-11,
-        'B21': 0.0,
-        'B02': 0.0,
-        'B12': -2.2953e-13,
-        'B22': 0.0,
-        'B1': -2.2953e-8
+        'B00': 4.9949e6,
+        'B10': -22.6474e9,
+        'B20': 3.3864e11,
+        'B01': -7.1552e9,
+        'B11': 0.0,  # No value in table
+        'B21': 0.0,  # No value in table
+        'B02': 2.8026e11,
+        'B12': 0.0,  # No value in table
+        'B1': -2.2953e8
     }
 }
