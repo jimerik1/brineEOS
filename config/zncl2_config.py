@@ -19,7 +19,7 @@ CONFIG = {
         }
     },
     'phi_v0_coeffs': {
-        'A00': 1.6470e5,
+        'A00': 1.6470e-5,
         'A10': 0.0,  # No value in table
         'A20': 0.0,  # No value in table
         'A01': 0.0,  # No value in table
@@ -31,7 +31,7 @@ CONFIG = {
     },
     'debye_huckel_coeffs': DEBYE_HUCKEL_COEFFS,
     'interaction_coeffs': {
-        'B00': 1.9141e6,
+        'B00': 1.9141e-6,
         'B10': 0.0,  # No value in table
         'B20': 0.0,  # No value in table
         'B01': 0.0,  # No value in table
@@ -39,6 +39,6 @@ CONFIG = {
         'B21': 0.0,  # No value in table
         'B02': 0.0,  # No value in table
         'B12': 0.0,  # No value in table
-        'B1': -1.7875e8
+        'B1': -1.7875e-8
     }
 }
