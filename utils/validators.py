@@ -1,3 +1,5 @@
+import numpy as np
+
 # utils/validators.py
 """
 Validation functions for API input
@@ -35,8 +37,8 @@ def validate_water_input(data):
             errors.append("pressure_interval: min pressure must be less than max pressure")
         elif data['pressure_interval'][0] < 0.1:
              errors.append("pressure_interval: min pressure must be >= 0.1 MPa (model limit)")
-        elif data['pressure_interval'][1] > 150.0:
-             errors.append("pressure_interval: max pressure must be <= 150.0 MPa (model limit)")
+        elif data['pressure_interval'][1] > 999.0:
+             errors.append("pressure_interval: max pressure must be <= 1000.0 MPa (model limit)")
 
 
     # Validate temperature interval

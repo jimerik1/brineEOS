@@ -22,7 +22,7 @@ payloads = [
             "CaCl2": 24.0,
             "CaBr2": 25.3
         },
-        "pressure_interval": [1.0, 100.0],
+        "pressure_interval": [1.0, 150.0],
         "pressure_resolution": 1.0,
         "temperature_interval": [295.00, 296.00],
         "temperature_resolution": 1.0
@@ -33,7 +33,7 @@ payloads = [
             "CaCl2": 24.0,
             "CaBr2": 25.3
         },
-        "pressure_interval": [1.0, 100.0],
+        "pressure_interval": [1.0, 150.0],
         "pressure_resolution": 1.0,
         "temperature_interval": [366.00, 367.00],
         "temperature_resolution": 1.0
@@ -44,7 +44,7 @@ payloads = [
             "CaCl2": 24.0,
             "CaBr2": 25.3
         },
-        "pressure_interval": [1.0, 100.0],
+        "pressure_interval": [1.0, 150.0],
         "pressure_resolution": 1.0,
         "temperature_interval": [449.00, 450.00],
         "temperature_resolution": 1.0
@@ -115,19 +115,34 @@ def plot_results(all_data):
     """Plot the results as points only (no connecting lines)"""
     plt.figure(figsize=(12, 8))
     
-    # Use different markers and colors for each dataset
-    markers = ['o', 's', '^']
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']  # Blue, Orange, Green
+    # Collect all pressures and densities into flat lists
+    all_pressures = []
+    all_densities = []
+    for pressures, densities, _ in all_data:
+        all_pressures.extend(pressures)
+        all_densities.extend(densities)
     
+    # Plot each series
+    markers = ['o', 's', '^']
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
     for i, (pressures, densities, label) in enumerate(all_data):
         if pressures and densities:
-            # Only plot the points without connecting lines (linestyle='None')
-            plt.scatter(pressures, densities, 
-                     marker=markers[i % len(markers)], 
-                     color=colors[i % len(colors)],
-                     s=20,  # Point size
-                     alpha=0.7,  # Transparency
-                     label=label)
+            plt.scatter(
+                pressures, densities,
+                marker=markers[i % len(markers)],
+                color=colors[i % len(colors)],
+                s=20,
+                alpha=0.7,
+                label=label
+            )
+    
+    # Dynamic axis limits with 5% padding
+    x_min, x_max = min(all_pressures), max(all_pressures)
+    y_min, y_max = min(all_densities), max(all_densities)
+    x_pad = (x_max - x_min) * 0.05
+    y_pad = (y_max - y_min) * 0.05
+    plt.xlim(x_min - x_pad, x_max + x_pad)
+    plt.ylim(y_min - y_pad, y_max + y_pad)
     
     plt.title('Brine Density vs Pressure for CaCl2(24%) + CaBr2(25.3%) Mixture')
     plt.xlabel('Pressure (MPa)')
@@ -135,18 +150,11 @@ def plot_results(all_data):
     plt.grid(True, alpha=0.3)
     plt.legend()
     
-    # Set y-axis limits to focus on the data range
-    plt.ylim(1560, 1640)
-    
-    # Save the plot
-    plt.savefig('brine_density_points_only.png', dpi=300, bbox_inches='tight')
     plt.tight_layout()
-    
+    plt.savefig('brine_density_points_only.png', dpi=300)
     print("Plot saved as 'brine_density_points_only.png'")
-    
-    # Show the plot
     plt.show()
-
+    
 def main():
     """Main function to run the validation"""
     all_data = []

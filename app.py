@@ -4,7 +4,7 @@ Main Flask application
 """
 import os
 from flask import Flask
-from routes import api_bp # Import the existing blueprint
+from routes.routes import api_bp
 from routes.water_routes import water_api_bp # Import the new water blueprint
 import logging
 from logging.handlers import RotatingFileHandler
