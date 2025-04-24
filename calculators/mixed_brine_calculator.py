@@ -176,7 +176,7 @@ class MixedBrineCalculator:
                 print(f"DEBUG: Apparent molal volume for {salt} before unit conversion: {phi_v:.6e} cm³/mol")
                 
                 # Convert from cm³/mol to m³/mol
-                phi_v_corrected = phi_v * 1e-6
+                phi_v_corrected = phi_v
                 print(f"DEBUG: Apparent molal volume for {salt} after unit conversion: {phi_v_corrected:.6e} m³/mol")
                 
                 # Add volume contribution to denominator

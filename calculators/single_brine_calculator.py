@@ -101,7 +101,7 @@ class SingleBrineCalculator:
         print(f"DEBUG: Apparent molal volume (ϕ_v) before unit conversion: {phi_v:.6e} cm³/mol")
         
         # Convert from cm³/mol to m³/mol for use in Equation 1
-        phi_v_corrected = phi_v * 1e-6
+        phi_v_corrected = phi_v
         print(f"DEBUG: Apparent molal volume (ϕ_v) after unit conversion: {phi_v_corrected:.6e} m³/mol")
         
         # Calculate density using Equation 1 from paper
