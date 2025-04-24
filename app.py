@@ -4,7 +4,8 @@ Main Flask application
 """
 import os
 from flask import Flask
-from routes import api_bp
+from routes import api_bp # Import the existing blueprint
+from routes.water_routes import water_api_bp # Import the new water blueprint
 import logging
 from logging.handlers import RotatingFileHandler
 from flask_cors import CORS
@@ -12,15 +13,15 @@ from flask_cors import CORS
 def create_app():
     """
     Create and configure the Flask application.
-    
+
     Returns:
         app: Configured Flask application
     """
     app = Flask(__name__)
-    
+
     # Enable Cross-Origin Resource Sharing
     CORS(app)
-    
+
     # Configure logging
     if not app.debug:
         if not os.path.exists('logs'):
@@ -33,15 +34,16 @@ def create_app():
         app.logger.addHandler(file_handler)
         app.logger.setLevel(logging.INFO)
         app.logger.info('Brine Density API startup')
-    
+
     # Register blueprints
     app.register_blueprint(api_bp)
-    
+    app.register_blueprint(water_api_bp) # Register the new water API blueprint
+
     # Health check endpoint
     @app.route('/health', methods=['GET'])
     def health_check():
         return {'status': 'ok'}
-    
+
     # Error handlers
     @app.errorhandler(404)
     def not_found_error(error):
@@ -51,7 +53,7 @@ def create_app():
     def internal_error(error):
         app.logger.error('Server Error: %s', error)
         return {'error': 'Internal server error'}, 500
-    
+
     return app
 
 if __name__ == "__main__":
