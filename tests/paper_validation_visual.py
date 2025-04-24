@@ -22,7 +22,7 @@ payloads = [
             "CaCl2": 24.0,
             "CaBr2": 25.3
         },
-        "pressure_interval": [1.0, 150.0],
+        "pressure_interval": [1.0, 100.0],
         "pressure_resolution": 1.0,
         "temperature_interval": [295.00, 296.00],
         "temperature_resolution": 1.0
@@ -33,7 +33,7 @@ payloads = [
             "CaCl2": 24.0,
             "CaBr2": 25.3
         },
-        "pressure_interval": [1.0, 150.0],
+        "pressure_interval": [1.0, 100.0],
         "pressure_resolution": 1.0,
         "temperature_interval": [366.00, 367.00],
         "temperature_resolution": 1.0
@@ -44,7 +44,7 @@ payloads = [
             "CaCl2": 24.0,
             "CaBr2": 25.3
         },
-        "pressure_interval": [1.0, 150.0],
+        "pressure_interval": [1.0, 100.0],
         "pressure_resolution": 1.0,
         "temperature_interval": [449.00, 450.00],
         "temperature_resolution": 1.0
