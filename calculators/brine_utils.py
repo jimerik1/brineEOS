@@ -1,8 +1,22 @@
 # calculators/brine_utils.py
 import numpy as np
-import math
-from iapws import IAPWS97
+from utils.coolprop_utils import calculate_water_density_cp
+
+
 def calculate_water_density(temperature, pressure):
+    """
+    Calculate water density via CoolProp (PropsSI).
+
+    Args:
+        temperature (float): Temperature in K
+        pressure (float): Pressure in MPa
+
+    Returns:
+        float: Density in kg/m³
+    """
+    return calculate_water_density_cp(temperature, pressure)
+
+def calculate_water_density_legacy(temperature, pressure):
     """
     Calculate the density of pure water at given T and P.
     
@@ -32,24 +46,6 @@ def calculate_water_density(temperature, pressure):
     print(f"DEBUG: Water density at T={temperature}K, P={pressure}MPa: {rho:.2f} kg/m³")
     return rho
 
-def calculate_water_density_iapws(temperature, pressure):
-    """
-    IAPWS-IF97 density for T-array, P-array.
-    Clamps P to [0.1, 100] MPa.
-    Returns an array of densities.
-    """
-    # 1) Clamp P elementwise
-    P_clamped = np.clip(pressure, 0.1, 100.0)
-
-    # 2) Define a scalar helper
-    def rho_scalar(T, P):
-        return IAPWS97(T=T, P=P).rho
-
-    # 3) Vectorize it
-    vec_rho = np.vectorize(rho_scalar)
-
-    # 4) Call over the grids
-    return vec_rho(temperature, P_clamped)
 
 def calculate_debye_huckel_slope(temperature, pressure, coeffs):
     """

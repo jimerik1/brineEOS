@@ -6,7 +6,6 @@ from .brine_utils import (
     calculate_phi_v0,
     calculate_interaction_parameter
 )
-from utils.water_density_lookup import lookup_water_density
 
 class SingleBrineCalculator:
     def __init__(self, salt_config):
