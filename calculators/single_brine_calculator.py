@@ -100,17 +100,14 @@ class SingleBrineCalculator:
         phi_v = self._calculate_apparent_molal_volume(molality, temperature, pressure)
         print(f"DEBUG: Apparent molal volume (ϕ_v) before unit conversion: {phi_v:.6e} cm³/mol")
         
-        # Convert from cm³/mol to m³/mol for use in Equation 1
-        phi_v_corrected = phi_v
-        print(f"DEBUG: Apparent molal volume (ϕ_v) after unit conversion: {phi_v_corrected:.6e} m³/mol")
-        
+                
         # Calculate density using Equation 1 from paper
         M_salt = self.config['molecular_weight']
         print(f"DEBUG: Salt molecular weight: {M_salt} kg/mol")
         
         # p = (1 + Σ mi*Mi) / (1/pw + Σ mi*φi)
         numerator = 1.0 + molality * M_salt
-        denominator = (1.0 / water_density) + molality * phi_v_corrected
+        denominator = (1.0 / water_density) + molality * phi_v
         
         print(f"DEBUG: Density equation: numerator = {numerator:.6f}, denominator = {denominator:.6e}")
         
