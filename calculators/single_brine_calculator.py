@@ -6,6 +6,7 @@ from .brine_utils import (
     calculate_phi_v0,
     calculate_interaction_parameter
 )
+from utils.water_density_lookup import lookup_water_density
 
 class SingleBrineCalculator:
     def __init__(self, salt_config):
@@ -93,8 +94,12 @@ class SingleBrineCalculator:
         """
         print(f"\nDEBUG: Calculating density for {self.config['name']} at {molality:.6f} mol/kg, P={pressure}MPa, T={temperature}K")
         
-        # Calculate water density at given temperature and pressure
+        # Lookup water density at given temperature and pressure
+        # water_density = lookup_water_density(temperature, pressure)
+        
+        # FALLBACK MODEL Calculate water density at given temperature and pressure
         water_density = calculate_water_density(temperature, pressure)
+        
         
         # Calculate apparent molal volume
         phi_v = self._calculate_apparent_molal_volume(molality, temperature, pressure)

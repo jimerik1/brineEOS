@@ -6,6 +6,7 @@ from .brine_utils import (
     calculate_phi_v0,
     calculate_interaction_parameter
 )
+from utils.water_density_lookup import lookup_water_density
 
 class MixedBrineCalculator:
     def __init__(self, salt_configs):
@@ -145,8 +146,11 @@ class MixedBrineCalculator:
                                 for ion in ion_molalities)
         print(f"DEBUG: Ionic strength: {ionic_strength:.4f}")
         
-        # Calculate water density at given conditions
+        # FALLBACK MODEL Calculate water density at given conditions
         water_density = calculate_water_density(temperature, pressure)
+        
+        # Lookup water density at given temperature and pressure
+        # water_density = lookup_water_density(temperature, pressure)
         
         # Calculate normalization factors
         N_factors = self._calculate_normalization_factors(
@@ -173,14 +177,10 @@ class MixedBrineCalculator:
                     salt, molality, temperature, pressure, ionic_strength, N_factors,
                     ion_molalities=ion_molalities, ion_charges=ion_charges
                 )
-                print(f"DEBUG: Apparent molal volume for {salt} before unit conversion: {phi_v:.6e} cm³/mol")
-                
-                # Convert from cm³/mol to m³/mol
-                phi_v_corrected = phi_v
-                print(f"DEBUG: Apparent molal volume for {salt} after unit conversion: {phi_v_corrected:.6e} m³/mol")
-                
+                print(f"DEBUG: Apparent molal volume for {salt}: {phi_v:.6e} m³/mol")
+                                
                 # Add volume contribution to denominator
-                vol_contrib = molality * phi_v_corrected
+                vol_contrib = molality * phi_v
                 denominator += vol_contrib
                 print(f"DEBUG: Volume contribution of {salt}: {vol_contrib:.6e}")
         
