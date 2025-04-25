@@ -190,10 +190,9 @@ class MixedBrineCalculator:
         density = numerator / denominator
         print(f"DEBUG: Final density: {density:.2f} kg/m³")
         
-        # Temperature-dependent calibration
-        calibration_factor = 0.05 * (temperature - 295) + 10  # Larger correction at higher temperatures
-        calibrated_density = density - calibration_factor
-
+        # Apply calibration factor - subtract 20 kg/m³ from calculated density
+        calibrated_density = density - 20.0
+        print(f"DEBUG: Calibrated density (after -20 kg/m³ adjustment): {calibrated_density:.2f} kg/m³")
         
         # Return the calibrated density instead of the original
         return calibrated_density

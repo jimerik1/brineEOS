@@ -93,10 +93,8 @@ class SingleBrineCalculator:
         """
         print(f"\nDEBUG: Calculating density for {self.config['name']} at {molality:.6f} mol/kg, P={pressure}MPa, T={temperature}K")
         
-        # Lookup water density at given temperature and pressure
-        # water_density = lookup_water_density(temperature, pressure)
         
-        # FALLBACK MODEL Calculate water density at given temperature and pressure
+        # Calculate water density at given temperature and pressure
         water_density = calculate_water_density(temperature, pressure)
         
         
