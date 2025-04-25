@@ -1,15 +1,16 @@
-# docker-compose.yml
 version: '3'
 
 services:
   brine-density-api:
-    build: .
+    build:
+      context: .                 # project root
+      dockerfile: CD/Dockerfile  # moved Dockerfile
     ports:
       - "5099:5000"
     volumes:
       - ./logs:/app/logs
     restart: always
     environment:
-      - FLASK_DEBUG=0        # 0 == off, 1 == on
+      - FLASK_DEBUG=0            # 0 = off, 1 = on
       - FLASK_APP=app.py
       - PYTHONOPTIMIZE=1

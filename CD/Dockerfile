@@ -10,8 +10,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# add src to path
+ENV PYTHONPATH=/app/src
+ENV PYTHONPATH=$PYTHONPATH
+
 # Environment variables
-ENV FLASK_APP=app.py
+ENV FLASK_APP=src/app.py
 ENV FLASK_ENV=production
 ENV PYTHONUNBUFFERED=1
 

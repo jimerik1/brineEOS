@@ -1,0 +1,232 @@
+{
+	"info": {
+		"_postman_id": "eba84208-3bf8-45b9-a8ae-39eada524cb1",
+		"name": "Brine EOS",
+		"description": "## **Brine EOS — Density Calculation API**\n\nCalculates fluid density for:\n\n| **Endpoint** | **Purpose** | **Method** |\n| --- | --- | --- |\n| /api/v1/calculate_density | • Single-salt brine• Mixed-salt brine | **POST** |\n| /api/v1/calculate_water_density | Pure water (CoolProp) | **POST** |\n| /healthz | Container health probe | **GET** |\n\n### **Units**\n\n| **Quantity** | **Default** | **Also accepted** |\n| --- | --- | --- |\n| Pressure | **MPa** | bar   (1 MPa = 10 bar) |\n| Temperature | **K** | C   (T \\[°C\\] + 273.15 → K) |\n\nDeclare alternative units with pressure_unit / temperature_unit; omit them to stay in MPa/K.\n\n### **Error Handling**\n\n- **400** – validation error → { \"error\": \"Validation error\", \"details\": \\[...\\] }\n    \n- **500** – calculation/runtime error → { \"error\": \"Calculation error: …\" }",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12388855"
+	},
+	"item": [
+		{
+			"name": "Simple brine",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"brine_type\": \"ZnCl2\",\n  \"base_density\": 1300.0,\n\n  \"pressure_interval\": [0.1, 150.0],\n  \"pressure_resolution\": 0.1,\n  \"pressure_unit\": \"MPa\",\n\n  \"temperature_interval\": [298.15, 299.15],\n  \"temperature_resolution\": 1.0,\n  \"temperature_unit\": \"K\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5099/api/v1/calculate_density",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5099",
+					"path": [
+						"api",
+						"v1",
+						"calculate_density"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Calculate water density",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"pressure_interval\": [0.1, 0.11],\n  \"pressure_resolution\": 0.01,\n  \"pressure_unit\": \"MPa\",\n\n  \"temperature_interval\": [298.15, 299.15],\n  \"temperature_resolution\": 1.0,\n  \"temperature_unit\": \"K\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5099/api/v1/calculate_water_density",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5099",
+					"path": [
+						"api",
+						"v1",
+						"calculate_water_density"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mixed brine",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"brine_type\": \"mixed\",\n  \"salt_composition\": {\n    \"CaCl2\": 24.0,\n    \"CaBr2\": 25.3\n  },\n  \"pressure_interval\": [1.0, 150.0],\n  \"pressure_resolution\": 10.0,\n  \"temperature_interval\": [295.00, 296.00],\n  \"temperature_resolution\": 1.0\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5099/api/v1/calculate_density",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5099",
+					"path": [
+						"api",
+						"v1",
+						"calculate_density"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Healthz",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Health endpoint returns 200 and status ok\", () => {",
+							"    pm.response.to.have.status(200);",
+							"    pm.expect(pm.response.json()).to.eql({ status: \"ok\" });",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5099/healthz",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5099",
+					"path": [
+						"healthz"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"/* ─────────────────────────  always check status 200  ─────────────────────── */",
+					"pm.test(\"Status code is 200\", () => {",
+					"    pm.response.to.have.status(200);",
+					"});",
+					"",
+					"/* ─────────────────────────  decide which tests to run  ───────────────────── */",
+					"const json = pm.response.json() || {};",
+					"const isDensityEndpoint =",
+					"      pm.request.url.path.join(\"/\").includes(\"calculate_density\") ||",
+					"      pm.request.url.path.join(\"/\").includes(\"calculate_water_density\");",
+					"",
+					"/* ─────────────────────────  density-specific tests  ──────────────────────── */",
+					"if (isDensityEndpoint) {",
+					"",
+					"    pm.test(\"Response has metadata + densities\", () => {",
+					"        pm.expect(json).to.have.property(\"metadata\");",
+					"        pm.expect(json).to.have.property(\"densities\");",
+					"    });",
+					"",
+					"    pm.test(\"Density matrix contains at least one value\", () => {",
+					"        const d = json.densities;",
+					"        const firstP = Object.keys(d)[0];",
+					"        const firstT = Object.keys(d[firstP])[0];",
+					"        pm.expect(d[firstP][firstT]).to.be.a(\"number\");",
+					"    });",
+					"",
+					"    /* Store a value for later requests */",
+					"    pm.environment.set(\"first_pressure\", json.metadata.pressure_points[0]);",
+					"}",
+					"",
+					"/* ─────────────────────────  health-endpoint test  ────────────────────────── */",
+					"if (!isDensityEndpoint) {",
+					"    pm.test(\"Health payload is {status:\\\"ok\\\"}\", () => {",
+					"        pm.expect(json).to.eql({ status: \"ok\" });",
+					"    });",
+					"}"
+				]
+			}
+		}
+	]
+}

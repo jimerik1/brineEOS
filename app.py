@@ -4,8 +4,8 @@ Main Flask application
 """
 import os
 from flask import Flask
-from routes.routes import api_bp
-from routes.water_routes import water_api_bp # Import the new water blueprint
+from routes.routes import api_bp     # Import the brine API blueprint
+from routes.water_routes import water_api_bp # Import the water blueprint
 import logging
 from logging.handlers import RotatingFileHandler
 from flask_cors import CORS

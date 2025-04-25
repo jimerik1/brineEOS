@@ -1,0 +1,35 @@
+# .dockerignore
+Dockerfile
+docker-compose.yml
+.git
+.gitignore
+README.md
+*.md
+*.postman_collection.json
+
+# local build artefacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# virtual-envs & environment files
+venv/
+.env
+
+# logs & runtime output
+logs/
+
+# tests and notebooks
+tests/
+notebooks/
+
+# static resources not required in the runtime image
+resources/
+
+# large media or data files kept only for docs/examples
+*.png
+*.jpg
+*.csv
