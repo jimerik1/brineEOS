@@ -34,7 +34,7 @@ CONFIG = {
     'interaction_coeffs': {
         'B00': 4.9949e-6,
         'B10': -22.6474e-9,
-        'B20': 3.3864e-11,
+        'B20': 3.3664e-11,
         'B01': -7.1552e-9,
         'B11': 0.0,  # No value in table
         'B21': 0.0,  # No value in table

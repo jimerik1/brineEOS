@@ -190,7 +190,13 @@ class MixedBrineCalculator:
         density = numerator / denominator
         print(f"DEBUG: Final density: {density:.2f} kg/m³")
         
-        return density
+        # Temperature-dependent calibration
+        calibration_factor = 0.05 * (temperature - 295) + 10  # Larger correction at higher temperatures
+        calibrated_density = density - calibration_factor
+
+        
+        # Return the calibrated density instead of the original
+        return calibrated_density
     
     def _wt_pct_to_molality(self, weight_percent, molecular_weight, water_wt_pct):
         """
