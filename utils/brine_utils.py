@@ -1,4 +1,4 @@
-# calculators/brine_utils.py
+# utils/brine_utils.py
 import numpy as np
 from utils.coolprop_utils import calculate_water_density_cp
 
@@ -43,7 +43,8 @@ def calculate_water_density_legacy(temperature, pressure):
     # Calculate density
     rho = rho0 * (1 + beta * dP) / (1 + alpha * dT)
     
-    print(f"DEBUG: Water density at T={temperature}K, P={pressure}MPa: {rho:.2f} kg/m³")
+    if __debug__:
+        print(f"DEBUG: Water density at T={temperature}K, P={pressure}MPa: {rho:.2f} kg/m³")
     return rho
 
 
@@ -75,7 +76,8 @@ def calculate_debye_huckel_slope(temperature, pressure, coeffs):
     
     A_v = 1e-6 * np.exp(exponent)
     
-    print(f"DEBUG: Debye-Hückel slope (A_v) at T={temperature}K, P={pressure}MPa: {A_v:.8e}")
+    if __debug__:
+        print(f"DEBUG: Debye-Hückel slope (A_v) at T={temperature}K, P={pressure}MPa: {A_v:.8e}")
     return A_v
 
 def calculate_phi_v0(temperature, pressure, coeffs):
@@ -114,7 +116,8 @@ def calculate_phi_v0(temperature, pressure, coeffs):
     # Combine all terms
     phi_v0 = term1 + term2 + term3
     
-    print(f"DEBUG: ϕ⁰_v at T={temperature}K, P={pressure}MPa: {phi_v0:.6e} cm³/mol")
+    if __debug__:
+        print(f"DEBUG: ϕ⁰_v at T={temperature}K, P={pressure}MPa: {phi_v0:.6e} cm³/mol")
     return phi_v0
 
 def calculate_interaction_parameter(temperature, pressure, ionic_strength, coeffs):
@@ -153,5 +156,6 @@ def calculate_interaction_parameter(temperature, pressure, ionic_strength, coeff
     # Calculate BMX (Equation 5-6 from paper)
     B_MX = B0 + B1 * ionic_strength
     
-    print(f"DEBUG: Interaction parameter B_MX at T={temperature}K, P={pressure}MPa, I={ionic_strength:.3f}: {B_MX:.8e}")
+    if __debug__:
+        print(f"DEBUG: Interaction parameter B_MX at T={temperature}K, P={pressure}MPa, I={ionic_strength:.3f}: {B_MX:.8e}")
     return B_MX

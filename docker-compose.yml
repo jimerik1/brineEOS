@@ -10,5 +10,6 @@ services:
       - ./logs:/app/logs
     restart: always
     environment:
+      - FLASK_DEBUG=0        # 0 == off, 1 == on
       - FLASK_APP=app.py
-      - FLASK_ENV=production
+      - PYTHONOPTIMIZE=1

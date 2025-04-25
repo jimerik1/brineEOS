@@ -10,6 +10,8 @@ import logging
 from logging.handlers import RotatingFileHandler
 from flask_cors import CORS
 
+MASTER_PID = os.getpid()          # pid of the process that imports this file
+
 def create_app():
     """
     Create and configure the Flask application.
@@ -35,12 +37,21 @@ def create_app():
         app.logger.setLevel(logging.INFO)
         app.logger.info('Brine Density API startup')
 
+        # Only log startup message if this is the master process
+        if os.getpid() == MASTER_PID:
+            internal_port = os.getenv("PORT", 5000)        # 5000 in container
+            host_port     = os.getenv("HOST_PORT", 5099)   # supply via compose
+            app.logger.info(
+                "Brine Density API master ready ‣ http://0.0.0.0:%s → container :%s",
+                host_port, internal_port,
+            )
+
     # Register blueprints
-    app.register_blueprint(api_bp)
-    app.register_blueprint(water_api_bp) # Register the new water API blueprint
+    app.register_blueprint(api_bp)       # Register the main brine API blueprint
+    app.register_blueprint(water_api_bp) # Register the water  blueprint
 
     # Health check endpoint
-    @app.route('/health', methods=['GET'])
+    @app.route('/healthz', methods=['GET'])
     def health_check():
         return {'status': 'ok'}
 

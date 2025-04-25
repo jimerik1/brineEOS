@@ -13,8 +13,8 @@ from pathlib import Path
 # --------------------------- configuration ---------------------------------
 BASE_URL        = "http://localhost:5099/api/v1/calculate_density"
 SALTS           = ["NaCl", "KCl", "CaCl2", "CaBr2", "ZnBr2", "ZnCl2"]
-T_K             = [298.15, 373.15, 423.15]          # 25 °C, 100 °C, 150 °C
-P_MIN, P_MAX    = 0.1, 100.0
+T_K             = [298.15]          # 25 °C
+P_MIN, P_MAX    = 0.5, 100.0
 P_STEP          = 1.0
 BASE_DENSITY    = 1200.0                            # kg m⁻³ for all salts
 CMAP            = plt.get_cmap("tab20")
@@ -66,7 +66,7 @@ for label, p, rho, style in series:
     plt.scatter(p, rho, label=label, **style, alpha=0.8)
 
 plt.title("Single-Salt Brine Densities (base ρ₀ = 1200 kg m⁻³)\n"
-          "0 – 100 MPa at 25 °C, 100 °C, 150 °C")
+          "0 – 100 MPa at 25 °C")
 plt.xlabel("Pressure (MPa)")
 plt.ylabel("Density (kg m$^{-3}$)")
 plt.grid(alpha=0.3)

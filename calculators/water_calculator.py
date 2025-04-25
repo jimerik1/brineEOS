@@ -24,7 +24,8 @@ class WaterCalculator:
         Returns:
             dict: Calculated densities at each pressure and temperature point
         """
-        print(f"DEBUG: Starting pure water calculation.")
+        if __debug__:
+            print(f"DEBUG: Starting pure water calculation.")
 
         # Generate pressure and temperature points
         pressures = np.arange(

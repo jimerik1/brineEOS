@@ -1,10 +1,10 @@
 # calculators/mixed_brine_calculator.py
 import numpy as np
-from .brine_utils import (
-    calculate_water_density, 
-    calculate_debye_huckel_slope, 
+from utils.brine_utils import (
+    calculate_water_density,
+    calculate_debye_huckel_slope,
     calculate_phi_v0,
-    calculate_interaction_parameter
+    calculate_interaction_parameter,
 )
 
 class MixedBrineCalculator:
@@ -33,7 +33,8 @@ class MixedBrineCalculator:
         Returns:
             dict: Calculated densities at each pressure and temperature point
         """
-        print(f"DEBUG: Starting mixed brine calculation with composition: {salt_composition}")
+        if __debug__:
+            print(f"DEBUG: Starting mixed brine calculation with composition: {salt_composition}")
         
         # Generate pressure and temperature points
         pressures = np.arange(
@@ -86,8 +87,9 @@ class MixedBrineCalculator:
         Returns:
             float: Density in kg/m³
         """
-        print(f"\nDEBUG: Calculating density for mixed brine at P={pressure}MPa, T={temperature}K")
-        print(f"DEBUG: Salt composition: {salt_composition}")
+        if __debug__:
+            print(f"\nDEBUG: Calculating density for mixed brine at P={pressure}MPa, T={temperature}K")
+            print(f"DEBUG: Salt composition: {salt_composition}")
         
         if not salt_composition:
             raise ValueError("Salt composition is required for mixed brine calculations")
@@ -98,7 +100,8 @@ class MixedBrineCalculator:
             if salt in self.salt_configs and pct > 0:
                 water_wt_pct -= pct
         
-        print(f"DEBUG: Water weight percentage: {water_wt_pct:.2f}%")
+        if __debug__:
+            print(f"DEBUG: Water weight percentage: {water_wt_pct:.2f}%")
         
         if water_wt_pct <= 0:
             raise ValueError("Invalid salt composition: total exceeds 100%")
@@ -112,7 +115,8 @@ class MixedBrineCalculator:
                     self.salt_configs[salt]['molecular_weight'], 
                     water_wt_pct
                 )
-                print(f"DEBUG: Molality of {salt}: {molalities[salt]:.6f} mol/kg")
+                if __debug__:
+                    print(f"DEBUG: Molality of {salt}: {molalities[salt]:.6f} mol/kg")
         
         # Calculate ion molalities and charges
         ion_molalities = {}
@@ -137,13 +141,16 @@ class MixedBrineCalculator:
                 ion_charges[anion] = config['ions']['anion']['charge']
             ion_molalities[anion] += molality * anion_stoich
         
-        print(f"DEBUG: Ion molalities: {ion_molalities}")
-        print(f"DEBUG: Ion charges: {ion_charges}")
+        if __debug__:
+            print(f"DEBUG: Ion molalities: {ion_molalities}")
+        if __debug__:
+            print(f"DEBUG: Ion charges: {ion_charges}")
         
         # Calculate ionic strength (Equation 3)
         ionic_strength = 0.5 * sum(ion_molalities[ion] * ion_charges[ion]**2 
                                 for ion in ion_molalities)
-        print(f"DEBUG: Ionic strength: {ionic_strength:.4f}")
+        if __debug__:
+            print(f"DEBUG: Ionic strength: {ionic_strength:.4f}")
         
         # FALLBACK MODEL Calculate water density at given conditions
         water_density = calculate_water_density(temperature, pressure)
@@ -155,7 +162,8 @@ class MixedBrineCalculator:
         N_factors = self._calculate_normalization_factors(
             ion_molalities, ion_charges
         )
-        print(f"DEBUG: Normalization factors: {N_factors}")
+        if __debug__:
+            print(f"DEBUG: Normalization factors: {N_factors}")
         
         # For each salt, calculate apparent molal volume
         numerator = 1.0  # Represents (1 + Σ mᵢMᵢ) in Equation 1
@@ -169,30 +177,37 @@ class MixedBrineCalculator:
                 # Add mass contribution to numerator
                 mass_contrib = molality * M_salt
                 numerator += mass_contrib
-                print(f"DEBUG: Mass contribution of {salt}: {mass_contrib:.6f}")
+                if __debug__:
+                    print(f"DEBUG: Mass contribution of {salt}: {mass_contrib:.6f}")
                 
                 # Calculate apparent molal volume
                 phi_v = self._calculate_apparent_molal_volume(
                     salt, molality, temperature, pressure, ionic_strength, N_factors,
                     ion_molalities=ion_molalities, ion_charges=ion_charges
                 )
-                print(f"DEBUG: Apparent molal volume for {salt}: {phi_v:.6e} m³/mol")
+                if __debug__:
+                    print(f"DEBUG: Apparent molal volume for {salt}: {phi_v:.6e} m³/mol")
                                 
                 # Add volume contribution to denominator
                 vol_contrib = molality * phi_v
                 denominator += vol_contrib
-                print(f"DEBUG: Volume contribution of {salt}: {vol_contrib:.6e}")
+                if __debug__:
+                    print(f"DEBUG: Volume contribution of {salt}: {vol_contrib:.6e}")
         
-        print(f"DEBUG: Final numerator: {numerator:.6f}")
-        print(f"DEBUG: Final denominator: {denominator:.6e}")
+        if __debug__:
+            print(f"DEBUG: Final numerator: {numerator:.6f}")
+        if __debug__:
+            print(f"DEBUG: Final denominator: {denominator:.6e}")
         
         # Calculate density using Equation 1
         density = numerator / denominator
-        print(f"DEBUG: Final density: {density:.2f} kg/m³")
+        if __debug__:
+            print(f"DEBUG: Final density: {density:.2f} kg/m³")
         
         # Apply calibration factor - subtract 20 kg/m³ from calculated density
         calibrated_density = density - 20.0
-        print(f"DEBUG: Calibrated density (after -20 kg/m³ adjustment): {calibrated_density:.2f} kg/m³")
+        if __debug__:
+            print(f"DEBUG: Calibrated density (after -20 kg/m³ adjustment): {calibrated_density:.2f} kg/m³")
         
         # Return the calibrated density instead of the original
         return calibrated_density
@@ -212,7 +227,8 @@ class MixedBrineCalculator:
         # The calculation from Equation A-3 in the paper:
         # Molality = (weight percentage of salt) / (molecular weight * weight percentage of water / 100)
         molality = (weight_percent/100) / (molecular_weight * water_wt_pct/100)
-        print(f"DEBUG: Converted {weight_percent}% {molecular_weight}kg/mol salt to {molality:.6f} mol/kg")
+        if __debug__:
+            print(f"DEBUG: Converted {weight_percent}% {molecular_weight}kg/mol salt to {molality:.6f} mol/kg")
         return molality
     
     def _calculate_normalization_factors(self, ion_molalities, ion_charges):
@@ -240,8 +256,10 @@ class MixedBrineCalculator:
             else:  # Anion
                 neg_charge_sum += molality * charge**2
         
-        print(f"DEBUG: Sum of Z²*m for positive ions: {pos_charge_sum:.6f}")
-        print(f"DEBUG: Sum of Z²*m for negative ions: {neg_charge_sum:.6f}")
+        if __debug__:
+            print(f"DEBUG: Sum of Z²*m for positive ions: {pos_charge_sum:.6f}")
+        if __debug__:
+            print(f"DEBUG: Sum of Z²*m for negative ions: {neg_charge_sum:.6f}")
         
         # Calculate normalization factor for each ion
         for ion, molality in ion_molalities.items():
@@ -277,7 +295,8 @@ class MixedBrineCalculator:
         Returns:
             float: Apparent molal volume in cm³/mol (needs conversion to m³/mol later)
         """
-        print(f"DEBUG: Calculating apparent molal volume for {salt} at {molality:.6f} mol/kg")
+        if __debug__:
+            print(f"DEBUG: Calculating apparent molal volume for {salt} at {molality:.6f} mol/kg")
         
         config = self.salt_configs[salt]
         
@@ -302,7 +321,8 @@ class MixedBrineCalculator:
         else:
             DH_term = dh_numerator / dh_denominator
         
-        print(f"DEBUG: Debye-Hückel term: {DH_term:.6e} cm³/mol")
+        if __debug__:
+            print(f"DEBUG: Debye-Hückel term: {DH_term:.6e} cm³/mol")
         
         # If ion molalities aren't provided, we skip the interaction terms
         if ion_molalities is None or ion_charges is None:
@@ -323,7 +343,8 @@ class MixedBrineCalculator:
                 N_ion = N_factors.get(ion, 0)
                 term = v_cation * N_ion * B_MX * molality_ion
                 cation_interaction += term
-                print(f"DEBUG: {cation}-{ion} interaction term: {term:.6e} cm³/mol")
+                if __debug__:
+                    print(f"DEBUG: {cation}-{ion} interaction term: {term:.6e} cm³/mol")
         
         anion_interaction = 0.0
         for ion, molality_ion in ion_molalities.items():
@@ -335,14 +356,17 @@ class MixedBrineCalculator:
                 N_ion = N_factors.get(ion, 0)
                 term = v_anion * N_ion * B_MX * molality_ion
                 anion_interaction += term
-                print(f"DEBUG: {anion}-{ion} interaction term: {term:.6e} cm³/mol")
+                if __debug__:
+                    print(f"DEBUG: {anion}-{ion} interaction term: {term:.6e} cm³/mol")
         
         # Total interaction term (divide by 2 per Equation 10)
         interaction_term = (cation_interaction + anion_interaction) / 2
-        print(f"DEBUG: Total interaction term: {interaction_term:.6e} cm³/mol")
+        if __debug__:
+            print(f"DEBUG: Total interaction term: {interaction_term:.6e} cm³/mol")
         
         # Combine all terms (Equation 2)
         phi_v = phi_v0 + DH_term + interaction_term
-        print(f"DEBUG: Final apparent molal volume (ϕ_v): {phi_v:.6e} cm³/mol")
+        if __debug__:
+            print(f"DEBUG: Final apparent molal volume (ϕ_v): {phi_v:.6e} cm³/mol")
         
         return phi_v
