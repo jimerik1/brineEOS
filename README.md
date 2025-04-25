@@ -154,10 +154,6 @@ brineEOS/
 
 ---
 
-## 📜 License
-
-MIT – see [LICENSE](LICENSE).
-
 **Reference**  
 N.P. Kemp & D.C. Thomas, “Density Modeling for Pure and Mixed‑Salt Brines as a Function of Composition, Temperature, and Pressure,” *SPE/IADC 16079*.
 
