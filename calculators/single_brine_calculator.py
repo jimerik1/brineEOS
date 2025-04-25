@@ -6,6 +6,7 @@ from .brine_utils import (
     calculate_phi_v0,
     calculate_interaction_parameter
 )
+from scipy.optimize import brentq
 
 class SingleBrineCalculator:
     def __init__(self, salt_config):
@@ -118,43 +119,16 @@ class SingleBrineCalculator:
         
         return density
     
-    def _density_to_molality(self, density, reference_temp=298.15, reference_pressure=0.1):
-        """
-        Convert density to molality for single salt solutions.
-        
-        Args:
-            density (float): Density in kg/m³
-            reference_temp (float): Reference temperature in K
-            reference_pressure (float): Reference pressure in MPa
-            
-        Returns:
-            float: Molality in mol/kg
-        """
-        print(f"DEBUG: Converting density {density:.2f} kg/m³ to molality")
-        
-        salt_name = self.config['name']
-        water_density = calculate_water_density(reference_temp, reference_pressure)
-        
-        # General approach based on the paper's concepts
-        M_salt = self.config['molecular_weight']
-        
-        # Use a theoretical approach based on density equation
-        # ρ = (1000 + m*M*1000) / (1000/ρw + m*φv)
-        # Where m is molality, M is molecular weight, ρw is water density
-        # Initially assuming φv is small:
-        # ρ ≈ (1000 + m*M*1000) / (1000/ρw)
-        # ρ ≈ ρw * (1 + m*M)
-        # (ρ/ρw - 1) ≈ m*M
-        # m ≈ (ρ/ρw - 1) / M
-        
-        # This is an approximation, but it's better than purely empirical formulas
-        approx_molality = (density/water_density - 1) / M_salt
-        
-        # Clip to reasonable range
-        result = max(0.001, min(approx_molality, 10.0))
-        
-        print(f"DEBUG: Density {density:.2f} kg/m³ converted to molality {result:.6f} mol/kg")
-        return result
+    def _density_to_molality(self, rho_target,
+                            T_ref=298.15, P_ref=0.1):
+
+        def f(m):
+            return self._calculate_density(m, P_ref, T_ref) - rho_target
+
+        # lower and upper bounds (mol/kg)
+        m_lo, m_hi = 1e-4, 10.0          # extend if very heavy brine
+        m_root = brentq(f, m_lo, m_hi, xtol=1e-8, rtol=1e-6, maxiter=50)
+        return m_root
     
     def _calculate_apparent_molal_volume(self, molality, temperature, pressure):
         """
